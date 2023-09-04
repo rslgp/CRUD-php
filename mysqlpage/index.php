@@ -49,19 +49,51 @@ if ($result === false) {
 
 //CREATE
 //to avoid sql injection
-$info="maca";
-$sql = "SELECT * FROM dishes WHERE dish_name = :info";
-
-$stmt = $conn->prepare($sql);
-$stmt->bindParam(":info", $info);
-$stmt->execute();
-$rows = $stmt->fetchAll();
-
-print '<table><tr><th>numero</th><th>string</th></tr>';
-foreach ($rows as $row){
-    print "<tr><td>$row[0]</td><td>$row[1]</td></tr>";
+function insertDish($pdo, $dish_name, $price, $is_spicy) {
+    try {
+        // Prepare the INSERT statement with named placeholders
+        $stmt = $pdo->prepare("INSERT INTO dishes (dish_name, price, is_spicy) 
+                    VALUES (:dish_name, :price, :is_spicy)");
+        
+        // Bind parameters
+        $stmt->bindParam(':dish_name', $dish_name, PDO::PARAM_STR);
+        $stmt->bindParam(':price', $price, PDO::PARAM_INT);
+        $stmt->bindParam(':is_spicy', $is_spicy, PDO::PARAM_INT);
+        
+        // Execute the statement
+        $stmt->execute();
+        
+        return true; // Insertion successful
+    } catch (PDOException $e) {
+        // Handle any errors here
+        die("Error: " . $e->getMessage());
+    }
 }
-print '</table>';
+
+// Usage
+$dish_name = 'maca';
+$price = 2.99;
+$is_spicy = 0;
+
+if (insertDish($conn, $dish_name, $price, $is_spicy)) {
+    echo "User inserted successfully.<br>";
+} else {
+    echo "Error inserting user.<br>";
+}
+
+
+////SIMPLE READ
+//$sql = "SELECT * FROM dishes";
+//
+//$stmt = $conn->prepare($sql);
+//$stmt->execute();
+//$rows = $stmt->fetchAll();
+//
+//print '<table><tr><th>numero</th><th>string</th></tr>';
+//foreach ($rows as $row){
+//    print "<tr><td>$row[0]</td><td>$row[1]</td></tr>";
+//}
+//print '</table>';
 
 //READ SIMPLE
 /* 
